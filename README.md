@@ -1,3 +1,10 @@
+## Estudiantes:
+
+### Juan Esteban Cortes
+
+### Andres Felipe Martinez
+
+### Norbey cardona
 
 ### Escuela Colombiana de Ingeniería
 ### Arquitecturas de Software - ARSW
