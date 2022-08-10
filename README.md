@@ -29,7 +29,10 @@
 	3. Ejecute y revise la salida por pantalla. 
 	![](img/punto1.png)	
 	4. Cambie el incio con 'start()' por 'run()'. Cómo cambia la salida?, por qué?.
+	![](img/punto1-2.png)
+
 	Si cambia al salida ya que los numeros salen en orden consecutivo
+	Por que el metodo start() ejecuta el hilo en paralelo, mientras que run() ejecuta un método. 
 
 **Parte II - Ejercicio Black List Search**
 
