@@ -6,6 +6,8 @@
 package edu.eci.arsw.blacklistvalidator;
 
 import edu.eci.arsw.spamkeywordsdatasource.HostBlacklistsDataSourceFacade;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,7 +31,7 @@ public class HostBlackListsValidator {
      * @param ipaddress suspicious host's IP address.
      * @return  Blacklists numbers where the given host's IP address was found.
      */
-    public List<Integer> checkHost(String ipaddress){
+    public List<Integer> checkHost(String ipaddress, int N){
         
         LinkedList<Integer> blackListOcurrences=new LinkedList<>();
         
@@ -39,15 +41,34 @@ public class HostBlackListsValidator {
         
         int checkedListsCount=0;
         
-        for (int i=0;i<skds.getRegisteredServersCount() && ocurrencesCount<BLACK_LIST_ALARM_COUNT;i++){
-            checkedListsCount++;
-            
-            if (skds.isInBlackListServer(i, ipaddress)){
-                
-                blackListOcurrences.add(i);
-                
-                ocurrencesCount++;
-            }
+        ArrayList<BLThread> blThreads = new ArrayList<BLThread>();
+        
+        int range = skds.getRegisteredServersCount() / N;
+        
+        for (int i = 0; i < N; i ++) {
+        	if (i < N - 1) {
+        		BLThread thr = new BLThread(ipaddress, i * range, ((i * range) + range) - 1, BLACK_LIST_ALARM_COUNT);
+        		thr.start();
+        		blThreads.add(thr);
+        	}else {
+        		BLThread thr = new BLThread(ipaddress, i * range, skds.getRegisteredServersCount() ,BLACK_LIST_ALARM_COUNT);
+        		thr.start();
+        		blThreads.add(thr);
+        	}
+        }
+        
+        for (BLThread e : blThreads) {
+			
+			try {
+				e.join();
+				blackListOcurrences.addAll(e.getBlacklistOcurrences());
+				ocurrencesCount += e.getOcurrences();
+				checkedListsCount += e.getCheckListCount();
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+		
+        	
         }
         
         if (ocurrencesCount>=BLACK_LIST_ALARM_COUNT){

@@ -9,28 +9,26 @@ import edu.eci.arsw.spamkeywordsdatasource.HostBlacklistsDataSourceFacade;
 public class BLThread extends Thread{
 	
 	private HostBlacklistsDataSourceFacade skds = HostBlacklistsDataSourceFacade.getInstance();
-	private static final Logger LOG = Logger.getLogger(HostBlackListsValidator.class.getName());
 	private int ocurrences = 0;
 	private String host;
 	private int serverRA, serverRB;
 	private LinkedList<Integer> blackListOcurrences=new LinkedList<>();
 	private int BLALARMCOUNT;
+	private int checkedListsCount;
 	
 	public BLThread(String host, int a, int b, int BLAC) {
 		this.host = host;
 		this.serverRA = a;
 		this.serverRB = b;
 		this.BLALARMCOUNT = BLAC;
-		
+		this.checkedListsCount = 0;
 	}
 
 	public int getOcurrences() {
 		return ocurrences;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void run() {
-		int checkedListsCount=0;
         
         for (int i = serverRA; i<serverRB && this.ocurrences<BLALARMCOUNT; i++){
             checkedListsCount++;
@@ -42,20 +40,14 @@ public class BLThread extends Thread{
             }
         }
         
-        if (this.ocurrences>=BLALARMCOUNT){
-            skds.reportAsNotTrustworthy(host);
-        }
-        else{
-            skds.reportAsTrustworthy(host);
-        }
         
-        LOG.log(Level.INFO, "Checked Black Lists:{0} of {1}", new Object[]{checkedListsCount, skds.getRegisteredServersCount()});
-        
-        this.stop();
 	}
 	
 	public LinkedList<Integer> getBlacklistOcurrences(){
 		return blackListOcurrences;
 	}
 	
+	public int getCheckListCount() {
+		return checkedListsCount;
+	}
 }
